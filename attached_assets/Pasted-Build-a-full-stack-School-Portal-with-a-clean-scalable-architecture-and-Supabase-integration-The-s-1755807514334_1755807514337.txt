@@ -1,0 +1,251 @@
+Build a full-stack School Portal with a clean, scalable architecture and Supabase integration. The solution must run inside Replit now, and be deployable to Vercel (frontend) and Render (backend) later.
+
+========================
+1) Project Architecture
+========================
+- Monorepo root with two apps:
+  /frontend  -> React + Vite + TailwindCSS
+  /backend   -> Node.js + Express
+- Shared conventions and modular structure to make adding features easy later.
+- Include a top-level README.md with:
+  - Project overview
+  - Local run instructions (Replit)
+  - Environment variables
+  - Deployment steps (Vercel for frontend, Render for backend)
+  - How to connect Supabase and seed demo data
+- Include a /.env.example in both frontend and backend.
+
+Folder structure (create exactly):
+/frontend/src/components      (Button, Card, Layout, Navbar, Footer, Form fields)
+/frontend/src/pages           (Home, About, Admissions, Contact, Auth pages)
+/frontend/src/dashboards      (Admin, Teacher, Student, Parent)
+/frontend/src/modules         (announcements, gallery, exams - placeholder modules)
+/frontend/src/services        (API clients: auth, announcements, gallery, exams)
+/frontend/src/styles          (global.css, theme tokens, typography)
+/backend/routes               (auth, admin, announcements, gallery, exams)
+/backend/controllers          (logic split by domain)
+/backend/middleware           (auth guard, role guard, error handler)
+/backend/models               (Supabase data helpers)
+/backend/config               (Supabase clients, CORS, config loader)
+/backend/scripts              (optional seed scripts)
+/backend/server.js            (entry point)
+
+===================================
+2) Branding & Demo Content (Homepage)
+===================================
+School Name:    Treasure-Home School
+Motto:          Qualitative Education and Moral Excellence
+Location line:  Seriki-Soyinka, Ifo, Ogun
+
+Homepage must include and be fully responsive:
+- Hero section:
+  - School name, motto, short tagline
+  - Prominent CTA button: "Enroll Your Child Now"
+  - Secondary CTA: "Visit Admissions"
+- Announcements preview:
+  - Show 3 latest published announcements (title, date, audience tag)
+  - "View all announcements" link
+- Admissions highlight:
+  - Brief copy + button linking to /admissions
+- Gallery preview:
+  - 6-image grid (use placeholder images first; load real URLs from Supabase Storage when available)
+  - "View full gallery" link
+- Quick facts / stats (demo numbers now; make it easy to edit):
+  - e.g., Students, Teachers, Clubs, Awards
+- Testimonials (1–2 demo cards; text can be edited later)
+- Contact teaser:
+  - Short address line: "Seriki-Soyinka, Ifo, Ogun"
+  - Button to /contact
+- Good footer (visible on all pages):
+  - School name, motto, address line
+  - Contact email/phone placeholders
+  - Footer links: About | Admissions | Contact | Portal Login
+  - Copyright with current year
+
+Global navigation (desktop + mobile):
+- Menu: Home, About, Admissions, Gallery, Announcements, Contact, Portal/Login
+
+=================================
+3) Auth, Roles & Access (Supabase)
+=================================
+- Use Supabase Auth for signup/login/forgot password.
+- Roles: admin, teacher, student, parent.
+- After signup, create/update a "profiles" row with role and name.
+- Forgot password: use Supabase password reset links.
+- Role-based routing on frontend:
+  - /dashboard/admin → Admin Dashboard
+  - /dashboard/teacher → Teacher Dashboard
+  - /dashboard/student → Student Dashboard
+  - /dashboard/parent → Parent Dashboard
+- Protect all dashboard routes on frontend (redirect to /login if not authenticated).
+- In backend, protect /admin, /announcements (write), /gallery (write), /exams (write) with middleware:
+  - authGuard -> verifies Supabase JWT
+  - roleGuard(allowedRoles) -> checks role claim
+- Provide a small "AuthStatus" component in the Navbar showing "Hello, {name}" when logged in, and a "Logout" button.
+
+==========================
+4) Core Modules (Phase 1)
+==========================
+Include working CRUD for the following with clean UIs and demo data; real data comes from Supabase.
+
+(A) Announcements
+- Table: announcements(id, title, content, audience ['all','students','parents','staff'], created_by, created_at)
+- Admin + Teachers can create/update/delete announcements.
+- Students + Parents can read announcements.
+- Homepage shows latest 3 announcements; /announcements page lists all with filters by audience.
+- Backend routes:
+  - GET /announcements
+  - POST /announcements (admin/teacher only)
+  - PUT /announcements/:id (admin/teacher only)
+  - DELETE /announcements/:id (admin only)
+
+(B) Gallery (Images)
+- Supabase Storage bucket: "gallery" (public read)
+- Table: gallery(id, title, description, file_url, uploaded_by, uploaded_at)
+- Admin + Staff can upload/delete images.
+- Everyone can view gallery.
+- Backend routes:
+  - GET /gallery
+  - POST /gallery (admin/staff only) -> expects title, description, and uploads file to Supabase Storage; save public URL to table
+  - DELETE /gallery/:id (admin/staff only)
+
+(C) Admin User Management
+- Admin dashboard: list users, create user (email, name, role), edit user (name, role), delete user.
+- Creating a user:
+  - Option 1: invite via Supabase Auth (send invite email), or
+  - Option 2: admin creates user with temporary password (document both options in README).
+- Backend routes:
+  - GET /admin/users (admin only)
+  - POST /admin/users (admin only)
+  - PUT /admin/users/:id (admin only)
+  - DELETE /admin/users/:id (admin only)
+
+=========================================
+5) Exams (Scaffold Only + Consistent Styling)
+=========================================
+We only need the **structure and styling now** to avoid Replit limits. Implement minimal read-only screens and clear TODOs for future logic.
+
+- Add module scaffolding for future Online Exams with Question Bank:
+  Tables to create in Supabase now (empty or with a few demo rows):
+    - question_bank(id, subject, topic, difficulty ['easy','medium','hard'], type ['mcq','short'], body, options jsonb, answer_key, created_by, created_at)
+    - exams(id, title, subject, duration_minutes, total_marks, created_by, created_at, published boolean default false)
+    - exam_questions(id, exam_id, question_id, points)
+    - exam_attempts(id, exam_id, student_id, started_at, submitted_at, score numeric, auto_graded boolean default false)
+    - exam_answers(id, attempt_id, question_id, answer jsonb, is_correct boolean)
+
+- Frontend placeholders:
+  - Teacher dashboard: "Exam Builder" (create exam form UI only; no heavy logic yet), "Question Bank" list UI.
+  - Student dashboard: "My Exams" list UI (shows published exams; clicking shows an exam page with consistent typography and inputs).
+- Styling:
+  - Provide consistent exam page styles: clear typography scale, uniform spacing, Card + Button components, form fields (radio/checkbox/text), a sticky top bar with timer placeholder.
+  - Put shared tokens in /frontend/src/styles (font sizes, spacing, shadows) applied across all pages so exam pages match the rest of the site later.
+
+===============================
+6) Frontend: Pages & Components
+===============================
+Pages to implement now:
+- / (Home): sections described above incl. CTA "Enroll Your Child Now"
+- /about
+- /admissions (simple process steps + CTA to contact or signup)
+- /gallery (grid using gallery table/URLs)
+- /announcements (list + filters)
+- /contact (form: name, email, message -> POST to backend /contact; backend can log to console for now)
+- /login, /signup, /forgot-password
+- /dashboard/admin, /dashboard/teacher, /dashboard/student, /dashboard/parent
+
+Components (make them reusable + documented):
+- Layout (applies Navbar, container, footer)
+- Navbar (role-aware links; shows AuthStatus)
+- Footer (with school name, motto, address line)
+- Button, Card, Input, Select, TextArea
+- AnnouncementCard, GalleryCard
+- EmptyState (for no data)
+- ProtectedRoute HOC (role-based guard)
+
+================================
+7) Backend: API & Middleware
+================================
+- Use Express with CORS enabled (allow Vercel frontend origin env var).
+- Auth middleware:
+  - Verify Supabase JWT from Authorization: Bearer <token>
+  - Decode and attach user + role to req.user
+- Role middleware: roleGuard(['admin']), roleGuard(['admin','teacher']), etc.
+- Routes:
+  - /auth: login, signup, forgot-password, logout
+  - /admin: CRUD users (admin only)
+  - /announcements: CRUD (write: admin/teacher; read: all)
+  - /gallery: list, upload (write: admin/staff), delete (admin/staff)
+  - /exams: minimal endpoints for lists/placeholders only (no grading logic yet)
+  - /contact: accept contact form POST; log payload for now (TODO: email later)
+
+- Config:
+  - SUPABASE_URL, SUPABASE_ANON_KEY (frontend)
+  - SUPABASE_SERVICE_ROLE_KEY (backend for admin operations only)
+  - Document in README how to set these in Replit and in Vercel/Render
+
+========================================
+8) Styling System (Consistent Everywhere)
+========================================
+- TailwindCSS configured with a small design system:
+  - Colors: primary, primary-foreground, muted, background, card, border
+  - Font scale: xs, sm, base, lg, xl, 2xl…
+  - Spacing scale and shadow tokens for cards/buttons
+- Global styles in /frontend/src/styles/global.css applied via Layout
+- Exam page uses the same components (Card, Button, Input) for consistency
+- Accessible forms (labels, aria attributes, keyboard focus states)
+
+============================
+9) Demo Data & Feature Flags
+============================
+- Provide a small "seed" script or README instructions for creating:
+  - Admin user
+  - 1 teacher, 1 student, 1 parent
+  - 3 demo announcements
+  - 6 demo gallery entries (use placeholder URLs first)
+- Implement simple feature flags in frontend (e.g., src/config/features.ts):
+  - showExams: boolean
+  - showFees: boolean
+  - showAttendance: boolean
+  - Admin can toggle feature flags in UI (local state now; document how to wire to DB later)
+
+=================
+10) Deployment
+=================
+- Frontend:
+  - Build with Vite
+  - Include Vercel config notes in README
+  - Environment variables for frontend:
+    VITE_SUPABASE_URL
+    VITE_SUPABASE_ANON_KEY
+    VITE_API_BASE_URL (points to Render backend URL)
+- Backend:
+  - Provide a simple start script for Render (node server.js)
+  - Environment variables for backend:
+    SUPABASE_URL
+    SUPABASE_SERVICE_ROLE_KEY
+    ALLOWED_ORIGIN (Vercel URL)
+    PORT
+
+=====================
+11) README Must Cover
+=====================
+- How to create a Supabase project
+- How to create Storage bucket "gallery" (public read)
+- SQL to create tables (profiles, announcements, gallery, question_bank, exams, exam_questions, exam_attempts, exam_answers)
+- How to set Row Level Security (basic policies for reads/writes)
+- How to add .env values in Replit, Vercel, Render
+- How to run locally in Replit (both apps)
+- Future TODOs: enable payments, attendance, grading, full exam logic
+
+====================
+12) Brand & Content
+====================
+Use these values in UI by default (editable later):
+- School: Treasure-Home School
+- Motto: "Qualitative Education and Moral Excellence"
+- Location line: "Seriki-Soyinka, Ifo, Ogun"
+- Hero CTA: "Enroll Your Child Now"
+- Secondary CTA: "Visit Admissions"
+- Footer repeats school name, motto, location, contact placeholders
+
+Deliver all code with comments and clear TODOs where logic is placeholder (exams).
