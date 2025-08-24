@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { storage } from "../storage";
-import { insertProfileSchema } from "@shared/schema";
+import { insertProfileSchema } from "../../shared/schema";
 
 // Simple password hashing (in production, use bcrypt)
 const hashPassword = (password: string): string => {
