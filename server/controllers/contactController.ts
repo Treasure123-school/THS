@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { storage } from "../storage";
-import { contactFormSchema } from "@shared/schema";
+import { contactFormSchema } from "../../shared/schema";
 
 export const contactController = {
   async submitMessage(req: Request, res: Response) {
