@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import cors from "cors";
+
+// Correct imports based on server folder structure
 import { storage } from "./storage";
 import { authController } from "./controllers/authController";
 import { announcementController } from "./controllers/announcementController";
@@ -39,53 +41,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/contact", contactController.submitMessage);
 
   // Protected announcement routes
-  app.post("/api/announcements", 
-    authMiddleware, 
-    roleGuard(["admin", "teacher"]), 
+  app.post(
+    "/api/announcements",
+    authMiddleware,
+    roleGuard(["admin", "teacher"]),
     announcementController.create
   );
-  app.put("/api/announcements/:id", 
-    authMiddleware, 
-    roleGuard(["admin", "teacher"]), 
+  app.put(
+    "/api/announcements/:id",
+    authMiddleware,
+    roleGuard(["admin", "teacher"]),
     announcementController.update
   );
-  app.delete("/api/announcements/:id", 
-    authMiddleware, 
-    roleGuard(["admin"]), 
+  app.delete(
+    "/api/announcements/:id",
+    authMiddleware,
+    roleGuard(["admin"]),
     announcementController.delete
   );
 
   // Protected gallery routes
-  app.post("/api/gallery", 
-    authMiddleware, 
-    roleGuard(["admin", "teacher"]), 
+  app.post(
+    "/api/gallery",
+    authMiddleware,
+    roleGuard(["admin", "teacher"]),
     galleryController.create
   );
-  app.delete("/api/gallery/:id", 
-    authMiddleware, 
-    roleGuard(["admin", "teacher"]), 
+  app.delete(
+    "/api/gallery/:id",
+    authMiddleware,
+    roleGuard(["admin", "teacher"]),
     galleryController.delete
   );
 
   // Admin-only routes
-  app.get("/api/admin/users", 
-    authMiddleware, 
-    roleGuard(["admin"]), 
+  app.get(
+    "/api/admin/users",
+    authMiddleware,
+    roleGuard(["admin"]),
     adminController.getUsers
   );
-  app.post("/api/admin/users", 
-    authMiddleware, 
-    roleGuard(["admin"]), 
+  app.post(
+    "/api/admin/users",
+    authMiddleware,
+    roleGuard(["admin"]),
     adminController.createUser
   );
-  app.put("/api/admin/users/:id", 
-    authMiddleware, 
-    roleGuard(["admin"]), 
+  app.put(
+    "/api/admin/users/:id",
+    authMiddleware,
+    roleGuard(["admin"]),
     adminController.updateUser
   );
-  app.delete("/api/admin/users/:id", 
-    authMiddleware, 
-    roleGuard(["admin"]), 
+  app.delete(
+    "/api/admin/users/:id",
+    authMiddleware,
+    roleGuard(["admin"]),
     adminController.deleteUser
   );
 
@@ -94,9 +105,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ message: "Exam system coming soon", exams: [] });
   });
 
-  app.get("/api/question-bank", 
-    authMiddleware, 
-    roleGuard(["admin", "teacher"]), 
+  app.get(
+    "/api/question-bank",
+    authMiddleware,
+    roleGuard(["admin", "teacher"]),
     (req, res) => {
       res.json({ message: "Question bank coming soon", questions: [] });
     }
