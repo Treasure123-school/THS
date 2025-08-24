@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { storage } from "../storage";
-import { insertAnnouncementSchema } from "../../shared/schema";
+import { insertAnnouncementSchema } from "../shared/schema";
 
 export const announcementController = {
   async getAll(req: Request, res: Response) {
