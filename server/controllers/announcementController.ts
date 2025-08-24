@@ -42,7 +42,6 @@ export const announcementController = {
     try {
       const { title, content, audience } = req.body;
 
-      // Validate input
       if (!title || !content || !audience) {
         return res.status(400).json({
           error: "Missing fields",
@@ -50,7 +49,6 @@ export const announcementController = {
         });
       }
 
-      // Validate audience
       const validAudiences = ["all", "students", "parents", "staff"];
       const audienceArray = Array.isArray(audience) ? audience : [audience];
       const invalidAudiences = audienceArray.filter((a: string) => !validAudiences.includes(a));
@@ -85,7 +83,6 @@ export const announcementController = {
       const { id } = req.params;
       const { title, content, audience } = req.body;
 
-      // Check if announcement exists
       const existingAnnouncement = await storage.getAnnouncementById(id);
       if (!existingAnnouncement) {
         return res.status(404).json({
@@ -94,7 +91,6 @@ export const announcementController = {
         });
       }
 
-      // Check if user can edit this announcement
       if (req.user!.role !== "admin" && existingAnnouncement.createdBy !== req.user!.id) {
         return res.status(403).json({
           error: "Access denied",
@@ -102,7 +98,6 @@ export const announcementController = {
         });
       }
 
-      // Validate audience if provided
       let audienceArray;
       if (audience) {
         const validAudiences = ["all", "students", "parents", "staff"];
@@ -144,7 +139,6 @@ export const announcementController = {
     try {
       const { id } = req.params;
 
-      // Check if announcement exists
       const existingAnnouncement = await storage.getAnnouncementById(id);
       if (!existingAnnouncement) {
         return res.status(404).json({
@@ -153,7 +147,6 @@ export const announcementController = {
         });
       }
 
-      // Only admins can delete announcements
       if (req.user!.role !== "admin") {
         return res.status(403).json({
           error: "Access denied",
