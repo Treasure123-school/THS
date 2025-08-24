@@ -89,13 +89,14 @@ export const verifySupabaseJWT = async (token: string) => {
 
 // Session configuration for express-session
 export const sessionConfig = {
-  secret: process.env.SESSION_SECRET || 'treasure-home-school-secret-key',
+  secret: process.env.SESSION_SECRET || "treasure-home-school-secret-key",
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+    secure: process.env.NODE_ENV === "production", // true in prod (Render/Vercel)
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    sameSite: 'lax' as const
-  }
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // important for cross-domain cookies
+  },
 };
+
